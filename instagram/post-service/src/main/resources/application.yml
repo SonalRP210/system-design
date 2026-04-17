@@ -4,3 +4,12 @@ spring:
 
 server:
   port: 8081
+
+aws:
+  dynamodb:
+    table-name: instagram-posts
+    region: us-east-1
+    endpoint: http://localhost:8000
+    access-key: local
+    secret-key: local
+    auto-create-table: true
