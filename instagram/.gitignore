@@ -1,0 +1,16 @@
+# IntelliJ / IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+
+# Local runtime uploads (post-service)
+post-service/storage/post-media/*
+!post-service/storage/post-media/.gitkeep
