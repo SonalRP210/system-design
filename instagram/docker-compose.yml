@@ -1,0 +1,71 @@
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - post-service
+      - follow-service
+      - feed-service
+
+  post-service:
+    build: ./post-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+
+  follow-service:
+    build: ./follow-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+
+  feed-service:
+    build: ./feed-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - redis
+      - kafka
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - kafka
+
+  media-service:
+    build: ./media-service
+    ports:
+      - "8085:8085"
+
+  kafka:
+    image: bitnami/kafka:latest
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9092:9092"
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: instagram
+      POSTGRES_USER: instagram
+      POSTGRES_PASSWORD: instagram
+    ports:
+      - "5432:5432"
