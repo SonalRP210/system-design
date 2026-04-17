@@ -9,7 +9,7 @@ aws:
   dynamodb:
     table-name: instagram-follows
     region: us-east-1
-    endpoint: http://localhost:8000
+    endpoint: ${DYNAMODB_ENDPOINT:http://localhost:8000}
     access-key: local
     secret-key: local
     auto-create-table: true

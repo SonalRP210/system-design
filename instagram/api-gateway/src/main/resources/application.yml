@@ -22,12 +22,16 @@ spring:
       # Gzip on multipart upstream requests breaks many proxies / backends.
       httpclient:
         compression: false
-      # Step 1 only: create post (multipart) + JSON CRUD under /posts/**
+      # Posts + follows (DynamoDB); feed/notifications/media added when gateway profile `platform` is active.
       routes:
         - id: post-service
           uri: ${POST_SERVICE_URI:http://post-service:8081}
           predicates:
             - Path=/posts/**
+        - id: follow-service
+          uri: ${FOLLOW_SERVICE_URI:http://follow-service:8082}
+          predicates:
+            - Path=/follows/**
 
 server:
   port: 8080

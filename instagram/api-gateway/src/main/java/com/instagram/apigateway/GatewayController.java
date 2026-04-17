@@ -21,7 +21,9 @@ public class GatewayController {
 
     @GetMapping("/routes")
     public List<RouteSummary> routes() {
-        return List.of(new RouteSummary("/posts/**", "post-service"));
+        return List.of(
+                new RouteSummary("/posts/**", "post-service"),
+                new RouteSummary("/follows/**", "follow-service"));
     }
 
     public record RouteSummary(String pathPattern, String targetService) {
