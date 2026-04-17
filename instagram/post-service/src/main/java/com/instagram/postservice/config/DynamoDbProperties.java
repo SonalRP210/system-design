@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class DynamoDbProperties {
 
     private String tableName = "instagram-posts";
+    private String followTableName = "instagram-follows";
     private String region = "us-east-1";
     private String endpoint = "http://localhost:8000";
     private String accessKey = "local";
@@ -18,6 +19,14 @@ public class DynamoDbProperties {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
+    }
+
+    public String getFollowTableName() {
+        return followTableName;
+    }
+
+    public void setFollowTableName(String followTableName) {
+        this.followTableName = followTableName;
     }
 
     public String getRegion() {

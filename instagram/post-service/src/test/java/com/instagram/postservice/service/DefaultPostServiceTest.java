@@ -11,6 +11,7 @@ import com.instagram.postservice.api.dto.CreatePostRequest;
 import com.instagram.postservice.api.dto.PostResponse;
 import com.instagram.postservice.api.dto.UpdatePostRequest;
 import com.instagram.postservice.entity.PostEntity;
+import com.instagram.postservice.entity.PostSortKey;
 import com.instagram.postservice.exception.PostNotFoundException;
 import com.instagram.postservice.repository.PostRepository;
 import java.util.Optional;
@@ -45,6 +46,7 @@ class DefaultPostServiceTest {
         PostEntity saved = captor.getValue();
 
         assertThat(saved.getPostId()).isNotBlank();
+        assertThat(saved.getPostSortKey()).isEqualTo(PostSortKey.build(saved.getCreatedAt(), saved.getPostId()));
         assertThat(saved.getUserId()).isEqualTo("user-1");
         assertThat(saved.getCaption()).isEqualTo("hello");
         assertThat(saved.getMediaUrl()).isEqualTo("https://img/1.jpg");

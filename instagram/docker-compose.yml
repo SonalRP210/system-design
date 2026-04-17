@@ -1,4 +1,5 @@
 # Default stack: API Gateway -> Post Service + Follow Service; DynamoDB Local (posts + follows); DynamoDB Admin UI (default host port 18001; set DYNAMODB_ADMIN_HOST_PORT if taken); media in S3 (LocalStack).
+# Home feed (GET /feed, fan-out in post-service) is proxied by the gateway to post-service. The separate `feed-service` container is only for `--profile platform` (Kafka/Redis).
 # No Postgres / Redis / Kafka unless you opt in to the rest of the platform (`--profile platform`).
 #
 # Default:  docker compose up -d --build

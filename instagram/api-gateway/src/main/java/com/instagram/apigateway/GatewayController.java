@@ -23,6 +23,7 @@ public class GatewayController {
     public List<RouteSummary> routes() {
         return List.of(
                 new RouteSummary("/posts/**", "post-service"),
+                new RouteSummary("/feed/**", "post-service"),
                 new RouteSummary("/follows/**", "follow-service"));
     }
 

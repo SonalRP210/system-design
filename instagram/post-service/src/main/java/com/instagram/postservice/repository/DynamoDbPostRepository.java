@@ -8,17 +8,18 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbIndex;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
-import software.amazon.awssdk.enhanced.dynamodb.Expression;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.Page;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
 @Repository
 public class DynamoDbPostRepository implements PostRepository {
 
-    private static final Comparator<PostEntity> CREATED_AT_DESC =
-            Comparator.comparing(PostEntity::getCreatedAt).reversed();
+    private static final Comparator<PostEntity> POST_SORT_KEY_DESC =
+            Comparator.comparing(PostEntity::getPostSortKey).reversed();
 
     private final DynamoDbTable<PostEntity> postTable;
 
@@ -34,32 +35,54 @@ public class DynamoDbPostRepository implements PostRepository {
 
     @Override
     public Optional<PostEntity> findById(String postId) {
-        return Optional.ofNullable(postTable.getItem(Key.builder().partitionValue(postId).build()));
+        DynamoDbIndex<PostEntity> index = postTable.index("postId-index");
+        for (Page<PostEntity> page : index.query(query -> query.queryConditional(QueryConditional.keyEqualTo(
+                        Key.builder().partitionValue(postId).build())))) {
+            for (PostEntity post : page.items()) {
+                return Optional.of(post);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
     public List<PostEntity> findAll() {
         List<PostEntity> posts = new ArrayList<>();
         postTable.scan().items().forEach(posts::add);
-        posts.sort(CREATED_AT_DESC);
+        posts.sort(POST_SORT_KEY_DESC);
         return posts;
     }
 
     @Override
     public List<PostEntity> findByUserId(String userId) {
-        Expression filterExpression = Expression.builder()
-                .expression("userId = :userId")
-                .putExpressionValue(":userId", AttributeValue.builder().s(userId).build())
-                .build();
-
         List<PostEntity> posts = new ArrayList<>();
-        postTable.scan(request -> request.filterExpression(filterExpression)).items().forEach(posts::add);
-        posts.sort(CREATED_AT_DESC);
+        for (Page<PostEntity> page : postTable.query(query -> query.queryConditional(QueryConditional.keyEqualTo(
+                        Key.builder().partitionValue(userId).build()))
+                .scanIndexForward(false))) {
+            posts.addAll(page.items());
+        }
+        return posts;
+    }
+
+    @Override
+    public List<PostEntity> findRecentByUserId(String userId, int limit) {
+        List<PostEntity> posts = new ArrayList<>();
+        for (Page<PostEntity> page : postTable.query(query -> query.queryConditional(QueryConditional.keyEqualTo(
+                        Key.builder().partitionValue(userId).build()))
+                .scanIndexForward(false)
+                .limit(limit))) {
+            for (PostEntity post : page.items()) {
+                posts.add(post);
+                if (posts.size() >= limit) {
+                    return posts;
+                }
+            }
+        }
         return posts;
     }
 
     @Override
     public void deleteById(String postId) {
-        postTable.deleteItem(Key.builder().partitionValue(postId).build());
+        findById(postId).ifPresent(postTable::deleteItem);
     }
 }

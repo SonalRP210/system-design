@@ -10,8 +10,11 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
 import software.amazon.awssdk.services.dynamodb.model.BillingMode;
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest;
 import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
+import software.amazon.awssdk.services.dynamodb.model.GlobalSecondaryIndex;
 import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement;
 import software.amazon.awssdk.services.dynamodb.model.KeyType;
+import software.amazon.awssdk.services.dynamodb.model.Projection;
+import software.amazon.awssdk.services.dynamodb.model.ProjectionType;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
 
@@ -31,10 +34,15 @@ public class DynamoDbTableInitializer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         if (!dynamoDbProperties.isAutoCreateTable()) {
-            LOGGER.info("DynamoDB auto table creation disabled for {}", dynamoDbProperties.getTableName());
+            LOGGER.info("DynamoDB auto table creation disabled");
             return;
         }
 
+        ensurePostsTable();
+        ensureFollowsTable();
+    }
+
+    private void ensurePostsTable() {
         String tableName = dynamoDbProperties.getTableName();
         if (tableExists(tableName)) {
             LOGGER.info("DynamoDB table {} already exists", tableName);
@@ -44,14 +52,70 @@ public class DynamoDbTableInitializer implements ApplicationRunner {
         LOGGER.info("Creating DynamoDB table {}", tableName);
         dynamoDbClient.createTable(CreateTableRequest.builder()
                 .tableName(tableName)
-                .attributeDefinitions(AttributeDefinition.builder()
-                        .attributeName("postId")
-                        .attributeType(ScalarAttributeType.S)
+                .attributeDefinitions(
+                        AttributeDefinition.builder()
+                                .attributeName("userId")
+                                .attributeType(ScalarAttributeType.S)
+                                .build(),
+                        AttributeDefinition.builder()
+                                .attributeName("postSortKey")
+                                .attributeType(ScalarAttributeType.S)
+                                .build(),
+                        AttributeDefinition.builder()
+                                .attributeName("postId")
+                                .attributeType(ScalarAttributeType.S)
+                                .build())
+                .keySchema(
+                        KeySchemaElement.builder()
+                                .attributeName("userId")
+                                .keyType(KeyType.HASH)
+                                .build(),
+                        KeySchemaElement.builder()
+                                .attributeName("postSortKey")
+                                .keyType(KeyType.RANGE)
+                                .build())
+                .globalSecondaryIndexes(GlobalSecondaryIndex.builder()
+                        .indexName("postId-index")
+                        .keySchema(KeySchemaElement.builder()
+                                .attributeName("postId")
+                                .keyType(KeyType.HASH)
+                                .build())
+                        .projection(Projection.builder()
+                                .projectionType(ProjectionType.ALL)
+                                .build())
                         .build())
-                .keySchema(KeySchemaElement.builder()
-                        .attributeName("postId")
-                        .keyType(KeyType.HASH)
-                        .build())
+                .billingMode(BillingMode.PAY_PER_REQUEST)
+                .build());
+    }
+
+    private void ensureFollowsTable() {
+        String tableName = dynamoDbProperties.getFollowTableName();
+        if (tableExists(tableName)) {
+            LOGGER.info("DynamoDB table {} already exists", tableName);
+            return;
+        }
+
+        LOGGER.info("Creating DynamoDB table {}", tableName);
+        dynamoDbClient.createTable(CreateTableRequest.builder()
+                .tableName(tableName)
+                .attributeDefinitions(
+                        AttributeDefinition.builder()
+                                .attributeName("followerId")
+                                .attributeType(ScalarAttributeType.S)
+                                .build(),
+                        AttributeDefinition.builder()
+                                .attributeName("followedId")
+                                .attributeType(ScalarAttributeType.S)
+                                .build())
+                .keySchema(
+                        KeySchemaElement.builder()
+                                .attributeName("followerId")
+                                .keyType(KeyType.HASH)
+                                .build(),
+                        KeySchemaElement.builder()
+                                .attributeName("followedId")
+                                .keyType(KeyType.RANGE)
+                                .build())
                 .billingMode(BillingMode.PAY_PER_REQUEST)
                 .build());
     }

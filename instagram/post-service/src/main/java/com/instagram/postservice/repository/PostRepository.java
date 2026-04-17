@@ -14,5 +14,7 @@ public interface PostRepository {
 
     List<PostEntity> findByUserId(String userId);
 
+    List<PostEntity> findRecentByUserId(String userId, int limit);
+
     void deleteById(String postId);
 }

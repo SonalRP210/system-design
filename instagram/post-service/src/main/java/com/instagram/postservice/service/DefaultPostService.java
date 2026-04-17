@@ -4,6 +4,7 @@ import com.instagram.postservice.api.dto.CreatePostRequest;
 import com.instagram.postservice.api.dto.PostResponse;
 import com.instagram.postservice.api.dto.UpdatePostRequest;
 import com.instagram.postservice.entity.PostEntity;
+import com.instagram.postservice.entity.PostSortKey;
 import com.instagram.postservice.exception.PostNotFoundException;
 import com.instagram.postservice.repository.PostRepository;
 import java.time.Instant;
@@ -24,10 +25,12 @@ public class DefaultPostService implements PostService {
     @Override
     public PostResponse createPost(CreatePostRequest request) {
         String now = Instant.now().toString();
+        String postId = UUID.randomUUID().toString();
 
         PostEntity postEntity = new PostEntity();
-        postEntity.setPostId(UUID.randomUUID().toString());
+        postEntity.setPostId(postId);
         postEntity.setUserId(request.userId());
+        postEntity.setPostSortKey(PostSortKey.build(now, postId));
         postEntity.setCaption(request.caption());
         postEntity.setMediaUrl(request.mediaUrl());
         postEntity.setCreatedAt(now);

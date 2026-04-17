@@ -51,6 +51,7 @@ public class PostController {
                 "service", "post-service",
                 "status", "UP",
                 "table", dynamoDbProperties.getTableName(),
+                "followTable", dynamoDbProperties.getFollowTableName(),
                 "posts", postService.countPosts());
     }
 

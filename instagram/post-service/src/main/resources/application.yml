@@ -12,6 +12,7 @@ server:
 aws:
   dynamodb:
     table-name: instagram-posts
+    follow-table-name: instagram-follows
     region: us-east-1
     endpoint: ${DYNAMODB_ENDPOINT:http://localhost:8000}
     access-key: local

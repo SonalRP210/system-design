@@ -22,12 +22,16 @@ spring:
       # Gzip on multipart upstream requests breaks many proxies / backends.
       httpclient:
         compression: false
-      # Posts + follows (DynamoDB); feed/notifications/media added when gateway profile `platform` is active.
+      # Posts + follows + home feed (fan-out in post-service). Standalone feed-service uses gateway profile `platform`.
       routes:
         - id: post-service
           uri: ${POST_SERVICE_URI:http://post-service:8081}
           predicates:
             - Path=/posts/**
+        - id: post-service-feed
+          uri: ${POST_SERVICE_URI:http://post-service:8081}
+          predicates:
+            - Path=/feed/**
         - id: follow-service
           uri: ${FOLLOW_SERVICE_URI:http://follow-service:8082}
           predicates:
