@@ -1,11 +1,17 @@
 package com.instagram.followservice.entity;
 
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+
+@DynamoDbBean
 public class FollowEntity {
 
     private String followerId;
     private String followedId;
     private String createdAt;
 
+    @DynamoDbPartitionKey
     public String getFollowerId() {
         return followerId;
     }
@@ -14,6 +20,7 @@ public class FollowEntity {
         this.followerId = followerId;
     }
 
+    @DynamoDbSortKey
     public String getFollowedId() {
         return followedId;
     }

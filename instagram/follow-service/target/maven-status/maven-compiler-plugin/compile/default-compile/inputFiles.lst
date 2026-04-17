@@ -1,0 +1,13 @@
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\api\dto\CreateFollowRequest.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\api\dto\FollowResponse.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\api\FollowController.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\config\DynamoDbConfig.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\config\DynamoDbProperties.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\config\DynamoDbTableInitializer.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\entity\FollowEntity.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\exception\ApiExceptionHandler.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\FollowServiceApplication.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\repository\DynamoDbFollowRepository.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\repository\FollowRepository.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\service\DefaultFollowService.java
+D:\github personal\system-design\instagram\follow-service\src\main\java\com\instagram\followservice\service\FollowService.java

@@ -1,0 +1,14 @@
+com\instagram\followservice\service\FollowService.class
+com\instagram\followservice\FollowServiceApplication.class
+com\instagram\followservice\exception\ApiExceptionHandler$ErrorResponse.class
+com\instagram\followservice\service\DefaultFollowService.class
+com\instagram\followservice\entity\FollowEntity.class
+com\instagram\followservice\api\dto\FollowResponse.class
+com\instagram\followservice\config\DynamoDbConfig.class
+com\instagram\followservice\config\DynamoDbProperties.class
+com\instagram\followservice\api\dto\CreateFollowRequest.class
+com\instagram\followservice\repository\DynamoDbFollowRepository.class
+com\instagram\followservice\repository\FollowRepository.class
+com\instagram\followservice\api\FollowController.class
+com\instagram\followservice\exception\ApiExceptionHandler.class
+com\instagram\followservice\config\DynamoDbTableInitializer.class
