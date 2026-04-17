@@ -1,0 +1,16 @@
+com\instagram\postservice\repository\DynamoDbPostRepository.class
+com\instagram\postservice\exception\PostNotFoundException.class
+com\instagram\postservice\config\DynamoDbConfig.class
+com\instagram\postservice\api\dto\PostResponse.class
+com\instagram\postservice\service\DefaultPostService.class
+com\instagram\postservice\repository\PostRepository.class
+com\instagram\postservice\service\PostService.class
+com\instagram\postservice\api\dto\CreatePostRequest.class
+com\instagram\postservice\api\PostController.class
+com\instagram\postservice\PostServiceApplication.class
+com\instagram\postservice\exception\ApiExceptionHandler.class
+com\instagram\postservice\config\DynamoDbProperties.class
+com\instagram\postservice\entity\PostEntity.class
+com\instagram\postservice\config\DynamoDbTableInitializer.class
+com\instagram\postservice\exception\ApiExceptionHandler$ErrorResponse.class
+com\instagram\postservice\api\dto\UpdatePostRequest.class
