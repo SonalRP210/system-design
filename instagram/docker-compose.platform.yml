@@ -1,0 +1,6 @@
+# Use with: docker compose -f docker-compose.yml -f docker-compose.platform.yml --profile platform up -d
+# Enables gateway routes to follow / feed / notifications / media when those services run.
+services:
+  api-gateway:
+    environment:
+      SPRING_PROFILES_ACTIVE: platform

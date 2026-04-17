@@ -1,0 +1,4 @@
+com\instagram\mediaservice\MediaController$UploadMediaRequest.class
+com\instagram\mediaservice\MediaController.class
+com\instagram\mediaservice\MediaServiceApplication.class
+com\instagram\mediaservice\MediaController$MediaMetadata.class

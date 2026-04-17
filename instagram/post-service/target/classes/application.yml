@@ -1,6 +1,10 @@
 spring:
   application:
     name: post-service
+  servlet:
+    multipart:
+      max-file-size: 32MB
+      max-request-size: 40MB
 
 server:
   port: 8081
@@ -9,7 +13,19 @@ aws:
   dynamodb:
     table-name: instagram-posts
     region: us-east-1
-    endpoint: http://localhost:8000
+    endpoint: ${DYNAMODB_ENDPOINT:http://localhost:8000}
     access-key: local
     secret-key: local
     auto-create-table: true
+
+app:
+  media:
+    # s3 | local (local uses storage-path + GET /media/{file})
+    storage-type: ${APP_MEDIA_STORAGE_TYPE:s3}
+    storage-path: ./storage/post-media
+    public-base-url: ${APP_MEDIA_PUBLIC_BASE_URL:}
+    bucket: ${AWS_S3_BUCKET:instagram-post-media}
+    key-prefix: posts/
+    s3-client-endpoint: ${APP_MEDIA_S3_CLIENT_ENDPOINT:}
+    s3-endpoint: ${AWS_S3_ENDPOINT:}
+    s3-force-path-style: ${AWS_S3_FORCE_PATH_STYLE:false}

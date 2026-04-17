@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import software.amazon.awssdk.core.exception.SdkException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -45,6 +47,39 @@ public class ApiExceptionHandler {
                 Instant.now().toString(),
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
+                exception.getMessage(),
+                request.getRequestURI());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    public ErrorResponse handleMaxUpload(MaxUploadSizeExceededException exception, HttpServletRequest request) {
+        return new ErrorResponse(
+                Instant.now().toString(),
+                HttpStatus.PAYLOAD_TOO_LARGE.value(),
+                "Payload Too Large",
+                "Upload exceeds configured size limit",
+                request.getRequestURI());
+    }
+
+    @ExceptionHandler(SdkException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    public ErrorResponse handleAws(SdkException exception, HttpServletRequest request) {
+        return new ErrorResponse(
+                Instant.now().toString(),
+                HttpStatus.BAD_GATEWAY.value(),
+                "Bad Gateway",
+                exception.getMessage(),
+                request.getRequestURI());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleIllegalState(IllegalStateException exception, HttpServletRequest request) {
+        return new ErrorResponse(
+                Instant.now().toString(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
                 exception.getMessage(),
                 request.getRequestURI());
     }

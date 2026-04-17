@@ -1,49 +1,99 @@
+# Step 1 (default): API Gateway -> Post Service; metadata in DynamoDB, media in S3 (LocalStack).
+# No Postgres / Redis / Kafka unless you opt in to the rest of the platform.
+#
+# Default:  docker compose up -d --build
+# Gateway host port: use API_GATEWAY_HOST_PORT=18080 if 8080 is already taken on Windows.
+# Platform: docker compose -f docker-compose.yml -f docker-compose.platform.yml --profile platform up -d --build
+# Extras:   add --profile optional for notification-service + media-service (needs Kafka for notifications)
 services:
+  localstack:
+    build: ./localstack
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3
+      DEBUG: "0"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 15s
+
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    ports:
+      - "8000:8000"
+
   api-gateway:
     build: ./api-gateway
+    # If 8080 is already in use on the host (IDE, another Spring app), set API_GATEWAY_HOST_PORT=18080
     ports:
-      - "8080:8080"
+      - "${API_GATEWAY_HOST_PORT:-8080}:8080"
     depends_on:
-      - post-service
-      - follow-service
-      - feed-service
+      post-service:
+        condition: service_started
 
   post-service:
     build: ./post-service
     ports:
-      - "8081:8081"
+      - "${POST_SERVICE_HOST_PORT:-8081}:8081"
     depends_on:
-      - postgres
+      dynamodb-local:
+        condition: service_started
+      localstack:
+        condition: service_healthy
+    environment:
+      DYNAMODB_ENDPOINT: http://dynamodb-local:8000
+      APP_MEDIA_STORAGE_TYPE: s3
+      AWS_S3_BUCKET: instagram-post-media
+      APP_MEDIA_S3_CLIENT_ENDPOINT: http://localstack:4566
+      AWS_S3_FORCE_PATH_STYLE: "true"
+      # Virtual-hosted style so browsers match LocalStack S3 routing (plain localhost:4566/bucket/key often returns NoSuchBucket).
+      APP_MEDIA_PUBLIC_BASE_URL: http://instagram-post-media.s3.localhost.localstack.cloud:4566
 
   follow-service:
+    profiles: ["platform"]
     build: ./follow-service
     ports:
       - "8082:8082"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
+      dynamodb-local:
+        condition: service_started
+    environment:
+      AWS_DYNAMODB_ENDPOINT: http://dynamodb-local:8000
 
   feed-service:
+    profiles: ["platform"]
     build: ./feed-service
     ports:
       - "8083:8083"
     depends_on:
-      - redis
-      - kafka
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
 
   notification-service:
+    profiles: ["optional"]
     build: ./notification-service
     ports:
       - "8084:8084"
     depends_on:
-      - kafka
+      kafka:
+        condition: service_started
 
   media-service:
+    profiles: ["optional"]
     build: ./media-service
     ports:
       - "8085:8085"
 
   kafka:
-    image: bitnami/kafka:latest
+    profiles: ["platform", "optional"]
+    image: bitnamilegacy/kafka:3.7.0
     environment:
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
@@ -57,11 +107,13 @@ services:
       - "9092:9092"
 
   redis:
+    profiles: ["platform"]
     image: redis:latest
     ports:
       - "6379:6379"
 
   postgres:
+    profiles: ["platform"]
     image: postgres:latest
     environment:
       POSTGRES_DB: instagram
