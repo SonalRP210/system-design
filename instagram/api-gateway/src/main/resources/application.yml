@@ -1,6 +1,29 @@
 spring:
   application:
     name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: post-service
+          uri: http://post-service:8081
+          predicates:
+            - Path=/posts/**
+        - id: follow-service
+          uri: http://follow-service:8082
+          predicates:
+            - Path=/follows/**
+        - id: feed-service
+          uri: http://feed-service:8083
+          predicates:
+            - Path=/feed/**
+        - id: notification-service
+          uri: http://notification-service:8084
+          predicates:
+            - Path=/notifications/**
+        - id: media-service
+          uri: http://media-service:8085
+          predicates:
+            - Path=/media/**
 
 server:
   port: 8080
